@@ -8,6 +8,7 @@ const {
 } = require("../controllers/tourController");
 
 const { protect, requireAdmin } = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
 const router = express.Router();
 
@@ -16,8 +17,8 @@ router.get("/", getAllTours);
 router.get("/:id", getSingleTour);
 
 // Protected routes (admin only)
-router.post("/", protect, requireAdmin, createTour);
-router.put("/:id", protect, requireAdmin, updateTour);
+router.post("/", protect, requireAdmin, upload.array("images"), createTour);
+router.put("/:id", protect, requireAdmin, upload.array("images"), updateTour);
 router.delete("/:id", protect, requireAdmin, deleteTour);
 
 module.exports = router;
