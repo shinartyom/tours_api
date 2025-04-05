@@ -1,6 +1,6 @@
 const TourGuide = require("../models/TourGuide");
 
-const getAllTourGuides = async (req, res) => {
+const getAllTourGuides = async (_req, res) => {
     try {
         const guides = await TourGuide.find();
         res.json(guides);
