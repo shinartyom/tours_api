@@ -1,5 +1,6 @@
 const Tour = require("../models/Tour");
 
+// GET ALL /api/tours
 const getAllTours = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -23,7 +24,7 @@ const getAllTours = async (req, res) => {
     }
 };
 
-// GET /api/tours/:id - Public
+// GET BY ID /api/tours/:id
 const getSingleTour = async (req, res) => {
     try {
         const tour = await Tour.findById(req.params.id);
@@ -39,7 +40,13 @@ const getSingleTour = async (req, res) => {
 // POST /api/tours - Admin only
 const createTour = async (req, res) => {
     try {
-        const newTour = new Tour(req.body);
+        const imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
+
+        const newTour = new Tour({
+            ...req.body,
+            images: imagePaths,
+        });
+
         const saved = await newTour.save();
         res.status(201).json(saved);
     } catch (err) {
@@ -51,10 +58,16 @@ const createTour = async (req, res) => {
 // PUT /api/tours/:id - Admin only
 const updateTour = async (req, res) => {
     try {
-        const updated = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true,
-        });
+        const imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
+
+        const updated = await Tour.findByIdAndUpdate(
+            req.params.id,
+            {
+                ...req.body,
+                ...(imagePaths.length > 0 && { images: imagePaths }),
+            },
+            { new: true, runValidators: true }
+        );
 
         if (!updated)
             return res.status(404).json({ message: "Tour not found" });
@@ -66,7 +79,6 @@ const updateTour = async (req, res) => {
     }
 };
 
-// DELETE /api/tours/:id - Admin only
 const deleteTour = async (req, res) => {
     try {
         const deleted = await Tour.findByIdAndDelete(req.params.id);
