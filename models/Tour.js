@@ -71,6 +71,23 @@ const TourSchema = new mongoose.Schema(
                 message: "Must have at least 2 tags",
             },
         },
+        rating: {
+            type: Number,
+            min: 0,
+            max: 5,
+            default: 0,
+        },
+        publish: {
+            type: Boolean,
+            default: true,
+        },
+        price: {
+            type: Number,
+            required: [true, "Price is required"],
+        },
+        salePrice: {
+            type: Number,
+        },
     },
     {
         timestamps: true,

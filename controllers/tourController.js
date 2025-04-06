@@ -6,10 +6,21 @@ const getAllTours = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
+        const search = req.query.search?.trim() || "";
+
+        // Build query
+        const query = search
+            ? {
+                  $or: [
+                      { name: { $regex: search, $options: "i" } },
+                      { destination: { $regex: search, $options: "i" } },
+                  ],
+              }
+            : {};
 
         const [tours, total] = await Promise.all([
-            Tour.find().skip(skip).limit(limit),
-            Tour.countDocuments(),
+            Tour.find(query).skip(skip).limit(limit),
+            Tour.countDocuments(query),
         ]);
 
         res.status(200).json({
